@@ -6,9 +6,6 @@ import store
 import wallet
 import error
 import re
-import db
-from bson.objectid import ObjectId
-
 
 BISON_DIGITS = 1
 BISON_REPR="BISON TOKEN"
@@ -25,7 +22,6 @@ regex = r'addr([0-9]+([a-zA-Z]+[0-9]+)+)'
 patter = re.compile(regex)
 max_length = 200
 
-
 @bot.event
 async def on_ready():
   print('Ready!')
@@ -35,6 +31,13 @@ async def on_ready():
 @bot.command()
 async def test(ctx):
   await ctx.send('I heard you! {0}'.format(ctx.author))
+
+@bot.command()
+async def clean_database(ctx):
+  for key in db.keys():
+    print("Cleaning: " + key)
+    del db[key]
+  await ctx.send('DB Cleaned')
 
 @bot.command(pass_context=True)
 async def command(ctx):
@@ -54,6 +57,66 @@ async def info(ctx):
     await ctx.send ("Please register your address using $register")
   else:
     await ctx.send ("Your address is *{0}*".format(user.actual_address.address))
+
+@bot.command(pass_context=True, help=bot_help_register)
+async def register_other(ctx, member: discord.Member, wallet_address: str):
+  user_id = ctx.author.id
+  print("************************REGISTER OTHER***************************")
+  print(user_id)
+  print(wallet_address)
+  if not (user_id == 968207994070368306 or user_id == 807103891182845992):
+    await ctx.send ("Only Admin can perform this operation!")
+    return
+
+  if not (patter.match(wallet_address) and len(wallet_address) <= max_length):
+    await ctx.send ("Please use proper address!")
+    return
+
+  user_id = member.id
+  existing_address = wallet.getAddressIdentifier(user_id)
+  if existing_address in db.keys():
+    existing_user = store.register_user(user_id)
+    prev_address = existing_user.actual_address.address
+    new_user = store.register_user(user_id, wallet_address)
+    if prev_address:
+      print_user_db(user_id)
+      await ctx.send (
+        f'You changed {member.mention} address from:\n'
+        f'`{prev_address}`\n to\n '
+        f'`{new_user.actual_address.address}`')
+      return
+
+  user = store.register_user(user_id, wallet_address)
+  print_user_db(user_id)
+  await ctx.send (f'{member.mention} been registered.\n'
+                  f'You can send him deposits to '
+                  f'`{user.actual_address.address}`.')
+
+@bot.command(pass_context=True, help=bot_help_register)
+async def register(ctx, wallet_address: str):
+  print("************************REGISTER***************************")
+  user_id = ctx.author.id
+  print(user_id)
+  print(wallet_address)
+  if not (patter.match(wallet_address) and len(wallet_address) <= max_length):
+    await ctx.send ("Please use proper address!")
+    return
+  existing_address = wallet.getAddressIdentifier(user_id)
+  if existing_address in db.keys():
+    existing_user = store.register_user(user_id)
+    prev_address = existing_user.actual_address.address
+    new_user = store.register_user(user_id, wallet_address)
+    if prev_address:
+      print_user_db(user_id)
+      await ctx.send (
+        f'Your deposit address has been changed from:\n'
+        f'`{prev_address}`\n to\n '
+        f'`{new_user.actual_address.address}`')
+      return
+
+  store.register_user(user_id, wallet_address)
+  print_user_db(user_id)
+  await ctx.send ('You have been registered. You can ask admin to provide you tokens')
 
 @bot.command(pass_context=True, help=bot_help_balance)
 async def balance(ctx):
