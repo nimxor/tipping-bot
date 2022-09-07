@@ -1,15 +1,10 @@
-from replit import db
+import db
 
-def getAddressIdentifier(userID: str) -> str:
-  return "{0}address".format(userID)
+def getWallet(userID: str) -> dict:
+  return db.getCollection().find_one({"discordId": userID})
 
-def getTokenIdentifier(address: str) -> str:
-  addr = address.replace("address", "")
-  return "{0}token".format(addr)
+def updateWallet(userID: str, changeset: dict) -> dict:
+  return db.getCollection().update_one({"discordId": userID}, { "$set": changeset })
 
-def checkAddressIdentifier(userID: str) -> str:
-  return "{0}address".format(userID) in db.keys()
-
-def checkTokenIdentifier(address: str) -> str:
-  addr = address.replace("address", "")
-  return "{0}token".format(addr) in db.keys()
+def initNewWallet(userID: str, addr: str) -> dict:
+  return db.getCollection().insert_one({ "discordId": userID, "tokens": 0, "address": addr})

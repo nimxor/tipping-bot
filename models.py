@@ -10,16 +10,14 @@ class WalletAddressField:
       self.address = address
       return
     if patter.match(address) and len(address) <= max_length:
-      print("Address LOL")
       self.address = address
     else:
       raise error.AddressSyntexError
 
 class User:
-  def __init__(self, user_id: str, actual_address: str, db_address: str):
+  def __init__(self, user_id: str, actual_address: str):
     self.user_id = user_id
     self.actual_address = WalletAddressField(actual_address)
-    self.db_address = db_address
 
 class Wallet:
   def __init__(self, wallet_address: str, balance: int):
@@ -36,4 +34,3 @@ class Withdrawal:
   def __init__(self, user: User, amount: int):
     self.user = user
     self.amount = amount
-
