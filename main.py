@@ -5,9 +5,7 @@ from discord.ext import commands
 import store
 import wallet
 import error
-from replit import db
 import re
-from keep_alive import keep_alive
 
 BISON_DIGITS = 1
 BISON_REPR="BISON TOKEN"
@@ -24,8 +22,6 @@ regex = r'addr([0-9]+([a-zA-Z]+[0-9]+)+)'
 patter = re.compile(regex)
 max_length = 200
 
-keep_alive()
-
 @bot.event
 async def on_ready():
   print('Ready!')
@@ -41,7 +37,7 @@ async def clean_database(ctx):
   for key in db.keys():
     print("Cleaning: " + key)
     del db[key]
-  await ctx.send('DB Cleaned')  
+  await ctx.send('DB Cleaned')
 
 @bot.command(pass_context=True)
 async def command(ctx):
@@ -75,8 +71,8 @@ async def register_other(ctx, member: discord.Member, wallet_address: str):
   if not (patter.match(wallet_address) and len(wallet_address) <= max_length):
     await ctx.send ("Please use proper address!")
     return
-  
-  user_id = member.id  
+
+  user_id = member.id
   existing_address = wallet.getAddressIdentifier(user_id)
   if existing_address in db.keys():
     existing_user = store.register_user(user_id)
@@ -95,7 +91,7 @@ async def register_other(ctx, member: discord.Member, wallet_address: str):
   await ctx.send (f'{member.mention} been registered.\n'
                   f'You can send him deposits to '
                   f'`{user.actual_address.address}`.')
-  
+
 @bot.command(pass_context=True, help=bot_help_register)
 async def register(ctx, wallet_address: str):
   print("************************REGISTER***************************")
@@ -117,7 +113,7 @@ async def register(ctx, wallet_address: str):
         f'`{prev_address}`\n to\n '
         f'`{new_user.actual_address.address}`')
       return
-      
+
   store.register_user(user_id, wallet_address)
   print_user_db(user_id)
   await ctx.send ('You have been registered. You can ask admin to provide you tokens')
@@ -132,7 +128,7 @@ async def balance(ctx):
   wallet = store.get_user_wallet(user.user_id)
   if wallet.wallet_address.address == None:
     await ctx.send('Please register your wallet using $register')
-  else:  
+  else:
     await ctx.send ('**Your balance**\n\n'
       f'Available: {wallet.balance/BISON_DIGITS} '
       f'{BISON_REPR}\n')
@@ -152,17 +148,17 @@ async def tip(ctx, member: discord.Member, amount: float):
   if (amount <= 0):
     await ctx.send (f'{ctx.author.mention} Don\'t be a fukin freak')
     return
-    
+
   if user_id == member.id:
     await ctx.send (f'{ctx.author.mention} you are not allowed to tip yourself!')
     return
-  
+
   user_from = store.register_user(user_id)
 
   if user_from.actual_address.address == None:
     await ctx.send (f'{ctx.author.mention} your wallet is not registered, please register using $register')
     return
-  
+
   user_to = store.register_user(member.id)
 
   real_amount = int(amount * BISON_DIGITS)
@@ -181,7 +177,7 @@ async def tip(ctx, member: discord.Member, amount: float):
   await ctx.send (
     f'Tip of {real_amount / BISON_DIGITS} '
     f'{BISON_REPR} '
-    f'was sent to {member.mention}\n')  
+    f'was sent to {member.mention}\n')
 
 @bot.command(pass_context=True, help=bot_help_tip)
 async def deposit(ctx, member: discord.Member, amount: float):
@@ -229,7 +225,7 @@ async def on_command_error(ctx, err):
   if isinstance(err, error.WalletNotFoundError):
     await ctx.send (f'Wallet not found.\n\n{err.args[0]}')
   if isinstance(err, error.InsufficientAmountError):
-    await ctx.send (f'Insufficient amount.\n\n{err.args[0]}')  
+    await ctx.send (f'Insufficient amount.\n\n{err.args[0]}')
   else:
     await ctx.send (f'Unexpected error.\n\n{err}')
   raise err
@@ -237,7 +233,7 @@ async def on_command_error(ctx, err):
 # async def update_balance_wallets():
 #   while not bot.is_closed:
     # store.update_balances()
-    # await asyncio.sleep(config.wallet_balance_update_interval) 
+    # await asyncio.sleep(config.wallet_balance_update_interval)
 
 @click.command()
 def main():
