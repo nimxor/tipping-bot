@@ -30,11 +30,11 @@ DISCORD_API_KEY=<api token>
 In the case of exposing environmental vars through the .env file, docker-compose needs to run as 
 
 ```
-docker-compose --env-file <location of env file> -f docker-compose.build.yml up --build -d
+docker-compose --env-file <location of env file> -f docker-compose.yml up --build -d
 ```
 In any other case:
 ```
-docker-compose -f docker-compose.build.yml up --build -d
+docker-compose -f docker-compose.yml up --build -d
 ```
 
 ### Step 3. Validation

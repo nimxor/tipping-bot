@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
   mongodb:
-    container_name: tipping_bot_db
+    container_name: tipping-bot-db
     image: mongo:5.0
     ports:
       - 27017:27017
@@ -10,8 +10,8 @@ services:
       - MONGO_INITDB_ROOT_USERNAME=${MONGODB_USERNAME}
       - MONGO_INITDB_ROOT_PASSWORD=${MONGODB_PASSWORD}
   tipping_bot:
-    container_name: tipping_bot
-    image: "tipping_bot"
+    container_name: tipping-bot
+    image: acrdiscord.azurecr.io/tipping_bot
     restart: "always"
     environment:
       - BISON_BANK_KEY=${DISCORD_API_KEY}
