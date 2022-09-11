@@ -35,14 +35,6 @@ async def test(ctx):
     await ctx.send('I heard you! {0}'.format(ctx.author))
 
 
-@bot.command()
-async def clean_database(ctx):
-    for key in db.keys():
-        print("Cleaning: " + key)
-        del db[key]
-    await ctx.send('DB Cleaned')
-
-
 @bot.command(pass_context=True)
 async def command(ctx):
     await ctx.send(
@@ -138,7 +130,7 @@ async def balance(ctx):
     user = store.register_user(user_id)
     print_user_db(user_id)
     wallet = store.get_user_wallet(user.user_id)
-    if wallet.wallet_address.address == None:
+    if wallet.wallet_address.address is None:
         await ctx.send('Please register your wallet using $register')
     else:
         await ctx.send('**Your balance**\n\n'
@@ -168,14 +160,14 @@ async def tip(ctx, member: discord.Member, amount: float):
 
     user_from = store.register_user(user_id)
 
-    if user_from.actual_address.address == None:
+    if user_from.actual_address.address is None:
         await ctx.send(f'{ctx.author.mention} your wallet is not registered, please register using $register')
         return
 
     user_to = store.register_user(member.id)
 
     real_amount = int(amount * BISON_DIGITS)
-    if user_to.actual_address.address == None:
+    if user_to.actual_address.address is None:
         await ctx.send(f'{member.mention} wallet is not registered, please register using $register')
         return
     user_from_wallet = store.get_user_wallet(user_id)

@@ -7,7 +7,7 @@ class WalletAddressField:
         regex = r'addr([0-9]+([a-zA-Z]+[0-9]+)+)'
         patter = re.compile(regex)
         max_length = 200
-        if address == None:
+        if address is None:
             self.address = address
             return
         if patter.match(address) and len(address) <= max_length:
