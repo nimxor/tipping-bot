@@ -1,7 +1,6 @@
 import models
 import error
 import wallet
-import db
 
 
 def register_user(user_id: str, user_wallet: str = None) -> models.User:
