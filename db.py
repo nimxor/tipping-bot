@@ -23,6 +23,7 @@ class _MongoDBService:
         # CONNECTION_STRING = "mongodb://{0}:{1}@tipping-bot-db:27017".format(username, password)
         CONNECTION_STRING = "mongodb+srv://{0}:{1}@cluster0.mtyoupg.mongodb.net/?retryWrites=true&w=majority".format(
             username, password)
+        print("Initializing Mongo client...")
         self._mongo_client = MongoClient(CONNECTION_STRING)
         print(self._mongo_client)
         type(self)._inited = True
